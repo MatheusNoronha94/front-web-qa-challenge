@@ -39,4 +39,22 @@ test.describe('Gerenciamento de usuários', { tag: '@usuarios' }, () => {
     await expect(users.rows).toHaveCount(0);
     await expect(users.info).toContainText('of 0 entries');
   });
+
+  test('USR-05 deve ordenar os usuários por nome', async () => {
+    const total = await users.totalEntries();
+    await users.showRowsPerPage('15');
+    await expect(users.rows).toHaveCount(Math.min(total, 15));
+
+    const nameCells = await users.columnCells('name');
+    const names = await nameCells.allInnerTexts();
+    const ascending = [...names].sort((a, b) => a.localeCompare(b));
+    const descending = [...ascending].reverse();
+    expect(names, 'pré-condição: a lista inicial já vem em ordem alfabética').toEqual(ascending);
+
+    await users.sortBy('name');
+    await expect(nameCells).toHaveText(ascending);
+
+    await users.sortBy('name');
+    await expect(nameCells).toHaveText(descending);
+  });
 });
