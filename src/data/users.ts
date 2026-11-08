@@ -4,3 +4,5 @@ export const existingUser = {
   email: 'alice@example.com',
   status: 'active',
 };
+
+export const nonexistentSearchTerm = 'zzzz';

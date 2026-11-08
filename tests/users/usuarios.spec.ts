@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { UsersPage } from '../../src/pages/UsersPage';
-import { existingUser } from '../../src/data/users';
+import { existingUser, nonexistentSearchTerm } from '../../src/data/users';
 
 test.describe('Gerenciamento de usuários', { tag: '@usuarios' }, () => {
   let users: UsersPage;
@@ -15,8 +15,8 @@ test.describe('Gerenciamento de usuários', { tag: '@usuarios' }, () => {
     await expect(users.rows).toHaveCount(5);
     await expect(users.info).toHaveText('Showing 1-5 of 15 entries');
   });
-  
-    test('USR-03 deve encontrar um usuário existente pela busca', { tag: '@mobile' }, async () => {
+
+  test('USR-03 deve encontrar um usuário existente pela busca', { tag: '@mobile' }, async () => {
     await users.searchFor(existingUser.searchTerm);
 
     await expect(users.rows).toHaveCount(1);
@@ -25,5 +25,18 @@ test.describe('Gerenciamento de usuários', { tag: '@usuarios' }, () => {
     await expect(row).toContainText(existingUser.email);
     await expect(row).toContainText(existingUser.status);
     await expect(users.info).toHaveText('Showing 1-1 of 1 entries');
+  });
+
+  test('USR-04 deve exibir a tabela vazia ao buscar usuário inexistente', {
+    tag: '@mobile',
+    annotation: {
+      type: 'defeito conhecido',
+      description: 'DEF-01: rodapé exibe "Showing 1-0 of 0 entries" e não há mensagem de tabela vazia',
+    },
+  }, async () => {
+    await users.searchFor(nonexistentSearchTerm);
+
+    await expect(users.rows).toHaveCount(0);
+    await expect(users.info).toContainText('of 0 entries');
   });
 });
