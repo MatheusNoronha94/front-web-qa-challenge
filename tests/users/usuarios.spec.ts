@@ -57,4 +57,22 @@ test.describe('Gerenciamento de usuários', { tag: '@usuarios' }, () => {
     await users.sortBy('name');
     await expect(nameCells).toHaveText(descending);
   });
+  test('USR-08 deve excluir um usuário e atualizar o total', {
+    tag: '@mobile',
+    annotation: {
+      type: 'defeito conhecido',
+      description: 'DEF-02: a exclusão acontece sem pedido de confirmação',
+    },
+  }, async () => {
+    const total = await users.totalEntries();
+
+    await users.deleteUser(existingUser.name);
+
+    await expect(users.rowByName(existingUser.name)).toHaveCount(0);
+    await expect(users.info).toContainText(`of ${total - 1} entries`);
+
+    await users.searchFor(existingUser.searchTerm);
+    await expect(users.rows).toHaveCount(0);
+  });
+
 });

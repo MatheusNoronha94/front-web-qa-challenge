@@ -38,9 +38,18 @@ export class UsersPage {
         return this.rows.locator(`td:nth-child(${index + 1})`);
     }
     async totalEntries() {
+
         await this.info.waitFor();
         const text = await this.info.innerText();
         const match = text.match(/of (\d+) entries/);
         return Number(match?.[1] ?? 0);
+    }
+
+    rowByName(name: string) {
+        return this.rows.filter({ hasText: name });
+    }
+
+    async deleteUser(name: string) {
+        await this.rowByName(name).getByRole('button', { name: 'Delete' }).click();
     }
 }
