@@ -21,6 +21,7 @@ Criar a base da automação Front Web da aplicação, cobrindo as jornadas de ma
 - Formulário de cadastro: envio válido, obrigatórios vazios e e-mail inválido
 - Dropdown com carregamento assíncrono
 - Análise automatizada de acessibilidade do formulário
+- Integração com API externa simulada por interceptação de rede (sucesso e erro 500)
 - Execução da jornada principal em resolução mobile
 - Execução em Chromium e Firefox, local e na pipeline
 
@@ -45,7 +46,7 @@ Criar a base da automação Front Web da aplicação, cobrindo as jornadas de ma
 ### Técnicos
 - Componentes assíncronos: o teste interagir antes de o elemento estar pronto (flakiness)
 - Seletores ambíguos: a página tem **três tabelas** e **dois campos "Full Name"** (cadastro e checkout)
-- Dependência de API de terceiro na seção Network & API
+- Dependência de API de terceiro na seção Network & API (mitigada nos testes com interceptação de rede)
 - Dados em memória: a tabela volta ao estado original a cada carregamento
 
 ### Experiência do usuário
@@ -72,7 +73,7 @@ Também pesou se o cenário **valida bem pela interface**. Comportamentos nativo
 
 ## Estratégia de cobertura
 
-Foram implementados **9 testes**, e vários deles cobrem mais de um cenário da matriz:
+Foram implementados **11 testes**, e vários deles cobrem mais de um cenário da matriz:
 
 | Teste | Cenários cobertos | Desktop | Mobile |
 |---|---|:---:|:---:|
@@ -85,6 +86,8 @@ Foram implementados **9 testes**, e vários deles cobrem mais de um cenário da 
 | FRM-02/03 Mensagens de erro | FRM-02, FRM-03, FRM-06 (negativo) | ✅ | |
 | DYN-01 Dropdown assíncrono | DYN-01, DYN-02, DYN-05, DYN-07 | ✅ | |
 | A11Y-06 Análise axe do formulário | A11Y-06, A11Y-02, FRM-07 | ✅ | |
+| NET-01 Usuários da API (resposta simulada) | NET-01 | ✅ | |
+| NET-02 Erro 500 da API (simulado) | NET-02 (negativo) | ✅ | |
 
 **Critério para o mobile:** entram os cenários em que o layout pode mudar o resultado (tabela em tela estreita, estado vazio, lixeira e botão de cadastro visíveis e clicáveis). Validações de regra (ordenação, mensagens de erro, axe) são a mesma lógica em qualquer tela e rodam só no desktop.
 
@@ -134,7 +137,7 @@ O WebKit (Safari) ficou de fora para manter a pipeline leve; é um próximo pass
 
 ## Próximos passos
 
-1. Teste com interceptação de rede na seção Network & API (`page.route` simulando erro 500 e lentidão)
+1. Simular lentidão da API externa e validar o estado de carregamento; deixar mais exata a asserção da mensagem de erro do NET-02
 2. Navegação entre páginas (USR-06) e confirmação antes de excluir, quando o DEF-02 for corrigido
 3. Navegação por teclado no formulário e armadilha de foco em modal (FRM-08, A11Y-07)
 4. Ignorar no axe apenas os elementos do DEF-08, e não a regra inteira
