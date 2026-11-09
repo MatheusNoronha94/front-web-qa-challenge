@@ -16,7 +16,7 @@ on:
         description: 'Grupo de testes'
         type: choice
         default: todos
-        options: [todos, '@usuarios', '@formulario', '@dinamico', '@acessibilidade', '@mobile']
+        options: [todos, '@usuarios', '@formulario', '@dinamico', '@acessibilidade', '@rede', '@mobile']
 
 concurrency:
   group: playwright-${{ github.ref }}
