@@ -1,27 +1,70 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Navegador (projeto do Playwright)'
+        type: choice
+        default: todos
+        options: [todos, chromium, firefox, mobile]
+      tag:
+        description: 'Grupo de testes'
+        type: choice
+        default: todos
+        options: [todos, '@usuarios', '@formulario', '@dinamico', '@acessibilidade', '@mobile']
+
+concurrency:
+  group: playwright-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    timeout-minutes: 60
+    name: Testes (${{ matrix.project }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.browser != 'todos') && format('["{0}"]', inputs.browser) || '["chromium", "firefox", "mobile"]') }}
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Instalar navegador
+        run: npx playwright install --with-deps ${{ matrix.project == 'firefox' && 'firefox' || 'chromium' }}
+
+      - name: Executar testes
+        env:
+          PROJECT: ${{ matrix.project }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [ -n "$TAG" ] && [ "$TAG" != "todos" ]; then
+            npx playwright test --project="$PROJECT" --grep "$TAG" --pass-with-no-tests
+          else
+            npx playwright test --project="$PROJECT"
+          fi
+
+      - name: Publicar relatório e evidências
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-${{ matrix.project }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
