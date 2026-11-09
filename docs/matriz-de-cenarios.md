@@ -56,3 +56,4 @@ A decisão de automatizar considera **risco x valor x custo de manutenção**. C
 | DEF-05 | Ordenação acionada por clique no cabeçalho (`th`), sem botão nem `aria-sort`; possível bloqueio para usuários de teclado (a confirmar manualmente) | Acessibilidade | Média |
 | DEF-06 | Após envio inválido do formulário, as mensagens de erro ficam fora da área visível e o foco não é levado ao primeiro campo com erro | UX / Acessibilidade | Média |
 | DEF-07 | Modal de checkout exibe barra de rolagem clara, destoando do tema escuro | Visual | Baixa |
+| DEF-08 | Contraste insuficiente no formulário de cadastro (tema claro): contador da Bio com 2,56:1 e botão Register com 4,46:1, abaixo do mínimo WCAG AA de 4,5:1 | Acessibilidade | Média |
