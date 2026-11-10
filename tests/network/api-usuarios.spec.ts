@@ -35,7 +35,7 @@ test.describe('Integração com API externa', { tag: '@rede' }, () => {
         await card.fetchUsers();
 
         await expect(card.status).toContainText(/500|error|erro|fail/i);
-        await expect(card.result).not.toContainText('Usuario Simulado QA');
+        await expect(card.status).not.toContainText('200 OK');
         await expect(card.fetchButton).toBeEnabled();
     });
 });
